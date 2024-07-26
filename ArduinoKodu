@@ -1,0 +1,53 @@
+#include<Wire.h>
+#include<LiquidCrystal_I2C.h>
+#include<PulseSensorPlayground.h>
+
+const int PulseSensorPin = A0;
+const int LCDColumns = 16;
+const int LCDRows = 2;
+const int LCDAddress = 0x27;
+
+LiquidCrystal_I2C lcd(LCDAddress, LCDColumns, LCDRows);
+PulseSensorPlayground pulseSensor;
+
+int myBPM;
+void setup() {
+ Serial.begin(9600);
+
+ lcd.init();
+ lcd.backlight();
+
+ pulseSensor.analogInput(PulseSensorPin);
+ pulseSensor.setThreshold(550);
+
+ if (pulseSensor.begin()){
+   lcd.clear();
+   lcd.setCursor(0, 0);
+   lcd.print("Pulse Sensor");
+   lcd.setCursor(0, 1);
+   lcd.print("Initialized!");
+   delay(2000);
+  } else {
+     lcd.clear();
+     lcd.setCursor(0, 0);
+     lcd.print("Sensor Error!");
+     while(true);
+    
+    }
+}
+  
+void loop() {
+ myBPM = pulseSensor.getBeatsPerMinute();
+
+ lcd.clear();
+ lcd.setCursor(0, 0);
+ lcd.print("Heart Rate:");
+ lcd.setCursor(0, 1);
+ lcd.print(myBPM);
+ lcd.print(" BPM");
+
+ Serial.print("BPM: ");
+ Serial.println(myBPM);
+ 
+ delay(1000);
+}
